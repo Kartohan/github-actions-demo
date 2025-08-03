@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
  */
 public class AppTest {
 
-    private final App app = new App();
+    private final OldFeatures app = new OldFeatures();
 
     @Test
     public void shouldGreetWithName() {

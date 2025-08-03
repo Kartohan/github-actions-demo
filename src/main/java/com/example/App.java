@@ -1,26 +1,50 @@
 package com.example;
 
-/**
- * A simple class to generate greetings.
- */
-public class App {
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-    /**
-     * Generates a greeting message for the given name.
-     * @param name The name to greet.
-     * @return A greeting string. Returns a generic greeting if the name is null or blank.
-     */
-    public String greet(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return "Hello, World!";
+public class App {
+    private ServerSocket serverSocket;
+    public App(ServerSocket serverSocket) {
+        this.serverSocket = serverSocket;
+    }
+
+    public void startServer() {
+        System.out.println("Server started");
+        try {
+            while (!serverSocket.isClosed()) {
+                Socket socket = serverSocket.accept();
+                System.out.println("New client connected");
+
+                ClientHandler clientHandler = new ClientHandler(socket);
+
+                Thread thread = new Thread(clientHandler);
+                thread.start();
+            }
+        } catch (IOException e) {
+            closeServerSocket();
         }
-        return "Hello, " + name + "!";
+    }
+
+    public void closeServerSocket() {
+        try {
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
-        App app = new App();
-        // Приклад використання
-        System.out.println(app.greet("User"));
-        System.out.println(app.greet(null));
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(8080);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        App server = new App(serverSocket);
+        server.startServer();
     }
 }
